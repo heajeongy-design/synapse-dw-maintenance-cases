@@ -38,7 +38,7 @@
 ```bash
 make test         # 사례 1·2 테스트 (Python 3.11 표준 라이브러리만), 사례 3 은 pyspark 가 있을 때만
 make repro        # 사례 1·2 재현 → results/
-make setup-spark  # pyspark 설치 (Java 17 필요)
+make setup-spark  # pyspark 설치 (Java 17 필요, Spark 3.3 조합은 requirements-spark33.txt)
 make repro-spark  # 사례 3 재현 → results/
 ```
 

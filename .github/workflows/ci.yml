@@ -7,25 +7,35 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: spark35
+            python: "3.11"
+            req: requirements.txt
+          - name: spark33
+            python: "3.10"
+            req: requirements-spark33.txt
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python }}
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
-      - run: pip install -r requirements.txt
+      - run: pip install -r ${{ matrix.req }}
       - name: repro (case 1, 2)
         run: make repro
       - name: repro (case 3, PySpark)
         run: make repro-spark
       - name: test
         shell: bash
-        run: make test 2>&1 | tee results/test_log.txt
+        run: make test 2>&1 | tee results/test_log_${{ matrix.name }}.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: results
+          name: results-${{ matrix.name }}
           path: results/

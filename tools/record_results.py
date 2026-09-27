@@ -122,7 +122,7 @@ def case3() -> Path:
         detail = r["detail"].replace("|", "\\|")
         lines.append(f"| {r['arrow']} | {r['case']} | {r['status']} | {detail} |")
     lines += ["", "해석은 docs/case3_schema_inference.md 참고. Synapse 런타임의 기본 Arrow 설정과 버전은 이 환경과 다를 수 있다."]
-    p = OUT / "case3_schema_inference.md"
+    p = OUT / f"case3_schema_inference_spark{pyspark.__version__}.md"
     p.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return p
 

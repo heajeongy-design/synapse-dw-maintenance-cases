@@ -1,0 +1,5 @@
+# Synapse Spark 3.3 런타임과 비슷한 조합 (Python 3.10, pandas 1.5) — 사례 3 비교용
+pyspark==3.3.4
+pandas==1.5.3
+numpy==1.23.5
+pyarrow==11.0.0
