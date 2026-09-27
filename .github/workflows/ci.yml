@@ -8,18 +8,24 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
       - run: pip install -r requirements.txt
-      - run: make test
-      - run: make repro && make repro-spark
+      - name: repro (case 1, 2)
+        run: make repro
+      - name: repro (case 3, PySpark)
+        run: make repro-spark
+      - name: test
+        shell: bash
+        run: make test 2>&1 | tee results/test_log.txt
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: results
           path: results/
