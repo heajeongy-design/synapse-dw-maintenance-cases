@@ -8,6 +8,8 @@
   A. 섞인 타입 + 스키마 없음          (원래 코드)
   B. 섞인 타입 + StringType 명시 스키마 (명시 스키마만 추가)
   C. 값을 문자열로 정규화(NULL 유지) + StringType 명시 스키마
+  D. 문자열로 읽었지만 빈칸은 NaN 으로 남은 경우 (숫자 셀도 '123' 문자열) — 스키마 없음
+  E. D 와 같은 입력 + StringType 명시 스키마
 """
 from __future__ import annotations
 
@@ -27,6 +29,20 @@ def sample_excel_like_df() -> pd.DataFrame:
             "Brand": ["제품X", "제품Y", "제품Z"],
             "Manufacturer": ["제조사M", "제조사N", float("nan")],
             "ATC": ["ATC-01", 2, "ATC-03"],
+        }
+    )
+
+
+def sample_read_as_str_df() -> pd.DataFrame:
+    """Excel 을 문자열로 읽은 경우: 숫자 셀은 '123' 같은 문자열, 빈칸은 NaN(float)."""
+    nan = float("nan")
+    return pd.DataFrame(
+        {
+            "Ingredient": pd.Series(["성분A", nan, "123"], dtype=object),
+            "Product": pd.Series(["제품X 정", "제품Y 정", "제품Z 캡슐"], dtype=object),
+            "Brand": pd.Series(["제품X", "제품Y", "제품Z"], dtype=object),
+            "Manufacturer": pd.Series(["제조사M", "제조사N", nan], dtype=object),
+            "ATC": pd.Series(["ATC-01", "2", "ATC-03"], dtype=object),
         }
     )
 
@@ -72,6 +88,8 @@ def run_matrix(spark) -> list[dict]:
             ("A 섞인 타입, 스키마 없음", pdf, None),
             ("B 섞인 타입, StringType 스키마", pdf, build_spark_schema()),
             ("C 문자열 정규화 + StringType 스키마", normalize_to_str(pdf), build_spark_schema()),
+            ("D 문자열로 읽음(빈칸 NaN), 스키마 없음", sample_read_as_str_df(), None),
+            ("E 문자열로 읽음(빈칸 NaN), StringType 스키마", sample_read_as_str_df(), build_spark_schema()),
         ):
             status, detail = try_create(spark, data, schema)
             results.append({"arrow": arrow, "case": label, "status": status, "detail": detail})
